@@ -112,22 +112,16 @@ pow b x = product $ take x $ repeat b
 -- Pre: The bitstring ([Int]) is a valid encoding of a Huffman tree
 --      of characters
 rebuildTree :: [Int] -> HTree Char
--- rebuildTree [] =
--- rebuildTree (1:ts) = Leaf 0 (binaryTo10 enc)
---   where
---     (enc, rest) = splitAt 6 ts
--- rebuildTree (0:ts) =
 rebuildTree ints = snd (rebuildTree' ints)
   where
-    rebuildTree' :: [Int] -> (Int, HTree Char)
-    rebuildTree' (0:xs) = (n - 1, Node 0 tr1 tr2)
+    rebuildTree' :: [Int] -> ([Int], HTree Char)
+    rebuildTree' (0:xs) = (remaining', Node 0 tr1 tr2)
       where
-        (_, x2) = splitAt ((length xs) - n) xs
-        (n, tr1) = rebuildTree' xs
-        (_, tr2) = rebuildTree' x2
-    rebuildTree' (1:xs) = (length rest, Leaf 0 (chr ((binaryTo10 enc))))
+        (remaining, tr1)  = rebuildTree' xs
+        (remaining', tr2) = rebuildTree' remaining
+    rebuildTree' (1:xs) = (rest, Leaf 0 (chr (binaryTo10 enc)))
       where
-        (enc, rest) = splitAt 6 xs
+        (enc, rest) = splitAt 7 xs
 
 binaryTo10 :: [Int] -> Int
 binaryTo10 [a] = a
